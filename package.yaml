@@ -6,10 +6,12 @@ version:
     0.1.0.0
 synopsis:
     "Generate XML Sitemaps & Sitemap Indexes"
-homepage:
-    https://github.com/prikhi/sitemap-gen#readme
+github:
+    prikhi/sitemap-gen
 license:
     BSD3
+license-file:
+    LICENSE
 author:
     Pavan Rikhi
 maintainer:
@@ -43,5 +45,5 @@ library:
         - -Wredundant-constraints
     dependencies:
         - text >= 1 && < 2
-        - time >= 1.8 && < 2
+        - time >= 1.6 && < 2
         - xmlgen >= 0.6 && < 1
