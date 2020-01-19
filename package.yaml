@@ -1,0 +1,41 @@
+---
+
+name:                
+    sitemap-gen
+version:             
+    0.1.0.0
+synopsis:
+    "Generate XML Sitemaps & Sitemap Indexes"
+homepage:            
+    https://github.com/prikhi/sitemap-gen#readme
+license:             
+    BSD3
+author:              
+    Pavan Rikhi
+maintainer:          
+    pavan.rikhi@gmail.com
+copyright:           
+    2019 Pavan Rikhi
+category:            
+    Web
+extra-source-files:
+    - README.md
+    - CHANGELOG.md
+#description:
+
+dependencies:
+    - base >= 4.7 && < 5
+
+library:
+    source-dirs:
+        src
+    ghc-options:
+        - -Wall
+        - -Wcompat
+        - -Wincomplete-record-updates
+        - -Wincomplete-uni-patterns
+        - -Wredundant-constraints
+    dependencies:
+        - text >= 1 && < 2
+        - time >= 1.8 && < 2
+        - xmlgen >= 0.6 && < 1
