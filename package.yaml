@@ -21,7 +21,13 @@ category:
 extra-source-files:
     - README.md
     - CHANGELOG.md
-#description:
+description: |
+    The @sitemap-gen@ package uses the @xmlgen@ package to generate XML
+    sitemaps that are compliant with the sitemaps.org XML schema.
+
+    See the "Web.Sitemap.Gen" module and the
+    <https://github.com/prikhi/sitemap-gen/blob/master/README.md README> file
+    for documentation & usage details.
 
 dependencies:
     - base >= 4.7 && < 5
