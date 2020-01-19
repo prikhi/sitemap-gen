@@ -23,17 +23,31 @@ module Web.Sitemap.Gen
     , sitemapNamespace
     , formatSitemapTime
     , renderLastModified
-    ) where
-
-import Data.Maybe (catMaybes)
-import Data.Time (UTCTime, formatTime, defaultTimeLocale)
-import GHC.Generics (Generic)
-import Text.XML.Generator
-    ( Xml, Elem, XmlOutput, Namespace, xrender, doc, defaultDocInfo, xelemQ
-    , namespace, xelems, xelemWithText, xtext, xelem
     )
+where
 
-import qualified Data.Text as T
+import           Data.Maybe                     ( catMaybes )
+import           Data.Time                      ( UTCTime
+                                                , formatTime
+                                                , defaultTimeLocale
+                                                )
+import           GHC.Generics                   ( Generic )
+import           Text.XML.Generator             ( Xml
+                                                , Elem
+                                                , XmlOutput
+                                                , Namespace
+                                                , xrender
+                                                , doc
+                                                , defaultDocInfo
+                                                , xelemQ
+                                                , namespace
+                                                , xelems
+                                                , xelemWithText
+                                                , xtext
+                                                , xelem
+                                                )
+
+import qualified Data.Text                     as T
 
 
 -- SITEMAPS
@@ -46,9 +60,12 @@ newtype Sitemap =
 
 renderSitemap :: XmlOutput x => Sitemap -> x
 renderSitemap sitemap =
-    xrender $ doc defaultDocInfo $
-        xelemQ sitemapNamespace "urlset" $
-            xelems $ map renderSitemapUrl $ sitemapUrls sitemap
+    xrender
+        $ doc defaultDocInfo
+        $ xelemQ sitemapNamespace "urlset"
+        $ xelems
+        $ map renderSitemapUrl
+        $ sitemapUrls sitemap
 
 data SitemapUrl =
     SitemapUrl
@@ -59,13 +76,12 @@ data SitemapUrl =
         } deriving (Show, Read, Eq, Generic)
 
 renderSitemapUrl :: SitemapUrl -> Xml Elem
-renderSitemapUrl url =
-    xelem "url" $ xelems $ catMaybes
-        [ Just $ xelemWithText "loc" $ sitemapLocation url
-        , renderLastModified <$> sitemapLastModified url
-        , xelem "changefreq" . renderChangeFrequency <$> sitemapChangeFrequency url
-        , xelemWithText "priority" . T.pack . show <$> sitemapPriority url
-        ]
+renderSitemapUrl url = xelem "url" $ xelems $ catMaybes
+    [ Just $ xelemWithText "loc" $ sitemapLocation url
+    , renderLastModified <$> sitemapLastModified url
+    , xelem "changefreq" . renderChangeFrequency <$> sitemapChangeFrequency url
+    , xelemWithText "priority" . T.pack . show <$> sitemapPriority url
+    ]
 
 data ChangeFrequency
     = Always
@@ -79,20 +95,13 @@ data ChangeFrequency
 
 renderChangeFrequency :: ChangeFrequency -> Xml Elem
 renderChangeFrequency = xtext . \case
-    Always ->
-        "always"
-    Hourly ->
-        "hourly"
-    Daily ->
-        "daily"
-    Weekly ->
-        "weekly"
-    Monthly ->
-        "monthly"
-    Yearly ->
-        "yearly"
-    Never ->
-        "never"
+    Always  -> "always"
+    Hourly  -> "hourly"
+    Daily   -> "daily"
+    Weekly  -> "weekly"
+    Monthly -> "monthly"
+    Yearly  -> "yearly"
+    Never   -> "never"
 
 
 -- INDEXES
@@ -105,9 +114,12 @@ newtype SitemapIndex =
 
 renderSitemapIndex :: XmlOutput x => SitemapIndex -> x
 renderSitemapIndex index =
-    xrender $ doc defaultDocInfo $
-        xelemQ sitemapNamespace "sitemapindex" $
-            xelems $ map renderIndexEntry $ indexEntries index
+    xrender
+        $ doc defaultDocInfo
+        $ xelemQ sitemapNamespace "sitemapindex"
+        $ xelems
+        $ map renderIndexEntry
+        $ indexEntries index
 
 data IndexEntry =
     IndexEntry
@@ -116,21 +128,17 @@ data IndexEntry =
         } deriving (Show, Read, Eq, Generic)
 
 renderIndexEntry :: IndexEntry -> Xml Elem
-renderIndexEntry entry =
-    xelem "sitemap" $ xelems $ catMaybes
-        [ Just $ xelemWithText "loc" $ indexLocation entry
-        , renderLastModified <$> indexLastModified entry
-        ]
+renderIndexEntry entry = xelem "sitemap" $ xelems $ catMaybes
+    [ Just $ xelemWithText "loc" $ indexLocation entry
+    , renderLastModified <$> indexLastModified entry
+    ]
 
 sitemapNamespace :: Namespace
-sitemapNamespace =
-    namespace "" "http://www.sitemaps.org/schemas/sitemap/0.9"
+sitemapNamespace = namespace "" "http://www.sitemaps.org/schemas/sitemap/0.9"
 
 -- | Render the 'UTCTime' in @YYYY-MM-DDTHH:MM:SS+00:00@ format.
 formatSitemapTime :: UTCTime -> T.Text
-formatSitemapTime =
-    T.pack . formatTime defaultTimeLocale "%FT%T+00:00"
+formatSitemapTime = T.pack . formatTime defaultTimeLocale "%FT%T+00:00"
 
 renderLastModified :: UTCTime -> Xml Elem
-renderLastModified =
-    xelemWithText "lastmod" . formatSitemapTime
+renderLastModified = xelemWithText "lastmod" . formatSitemapTime
