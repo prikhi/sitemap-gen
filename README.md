@@ -1,5 +1,8 @@
 # sitemap-gen
 
+[![sitemap-gen Build Status](https://travis-ci.org/prikhi/sitemap-gen.svg?branch=master)](https://travis-ci.org/prikhi/sitemap-gen)
+
+
 `sitemap-gen` is a Haskell library for generating XML sitemaps and sitemap
 index files.
 
