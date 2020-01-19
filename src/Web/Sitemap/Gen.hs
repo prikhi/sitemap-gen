@@ -2,8 +2,10 @@
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-{-| This module contains types & XML rendering functions based on the
-sitemaps.org Sitemap specification: https://www.sitemaps.org/protocol.html
+{-| The @Web.Sitemap.Gen@ module contains types & rendering functions
+to generate XML compliant with the sitemaps.org specification.
+
+For more information see https://www.sitemaps.org/protocol.html
 
 -}
 module Web.Sitemap.Gen
@@ -53,11 +55,16 @@ import qualified Data.Text                     as T
 -- SITEMAPS
 
 
+-- | A 'Sitemap' contains multiple 'SitemapUrl' elements which describe
+-- crawlable locations for search engines.
 newtype Sitemap =
     Sitemap
         { sitemapUrls :: [SitemapUrl]
         } deriving (Show, Read, Eq, Generic)
 
+-- | Render a Sitemap into a output format supported by the @xmlgen@ package.
+--
+-- In most cases you will want to generate a @ByteString@.
 renderSitemap :: XmlOutput x => Sitemap -> x
 renderSitemap sitemap =
     xrender
@@ -67,14 +74,22 @@ renderSitemap sitemap =
         $ map renderSitemapUrl
         $ sitemapUrls sitemap
 
+-- | A 'SitemapUrl' describes a single URL in a 'Sitemap'.
 data SitemapUrl =
     SitemapUrl
         { sitemapLocation :: T.Text
+        -- ^ The full URL of the page, including the protocol and
+        -- domain name.
         , sitemapLastModified :: Maybe UTCTime
+        -- ^ The time the page's content was last changed.
         , sitemapChangeFrequency :: Maybe ChangeFrequency
+        -- ^ How often does the content at the URL change?
         , sitemapPriority :: Maybe Double
+        -- ^ The relative priority of this URL compared to other URLs in
+        -- the sitemap.
         } deriving (Show, Read, Eq, Generic)
 
+-- | Render a 'SitemapUrl' as a @url@ XML element.
 renderSitemapUrl :: SitemapUrl -> Xml Elem
 renderSitemapUrl url = xelem "url" $ xelems $ catMaybes
     [ Just $ xelemWithText "loc" $ sitemapLocation url
@@ -83,16 +98,21 @@ renderSitemapUrl url = xelem "url" $ xelems $ catMaybes
     , xelemWithText "priority" . T.pack . show <$> sitemapPriority url
     ]
 
+-- | Describes how often a SitemapUrl' is updated. This is considered
+-- a hint for crawlers and may or may not be respected.
 data ChangeFrequency
     = Always
+    -- ^ The page changes every time it is visited.
     | Hourly
     | Daily
     | Weekly
     | Monthly
     | Yearly
     | Never
+    -- ^ The page is archived and will never change from now on.
     deriving (Show, Read, Eq, Enum, Bounded, Generic)
 
+-- | Build the XML text content for a 'ChangeFrequency'.
 renderChangeFrequency :: ChangeFrequency -> Xml Elem
 renderChangeFrequency = xtext . \case
     Always  -> "always"
@@ -107,11 +127,18 @@ renderChangeFrequency = xtext . \case
 -- INDEXES
 
 
+-- | A 'SitemapIndex' allows informing crawlers of multiple sitemap files
+-- hosted on the same domain.
+--
+-- See https://www.sitemaps.org/protocol.html#index
 newtype SitemapIndex =
     SitemapIndex
         { indexEntries :: [IndexEntry]
         } deriving (Show, Read, Eq, Generic)
 
+
+-- | Render a 'SitemapIndex' into an output format supported by the
+-- @xmlgen@ package.
 renderSitemapIndex :: XmlOutput x => SitemapIndex -> x
 renderSitemapIndex index =
     xrender
@@ -121,18 +148,29 @@ renderSitemapIndex index =
         $ map renderIndexEntry
         $ indexEntries index
 
+-- | A single sitemap entry for a sitemap index.
 data IndexEntry =
     IndexEntry
         { indexLocation :: T.Text
+        -- ^ The Full URL of a Sitemap, including the protocol.
+        --
+        -- E.g., @https://www.southernexposure.com/sitemap.xml@
         , indexLastModified :: Maybe UTCTime
+        -- ^ The time the sitemap was last changed.
         } deriving (Show, Read, Eq, Generic)
 
+-- | Render an 'IndexEntry' as a @sitemap@ element.
 renderIndexEntry :: IndexEntry -> Xml Elem
 renderIndexEntry entry = xelem "sitemap" $ xelems $ catMaybes
     [ Just $ xelemWithText "loc" $ indexLocation entry
     , renderLastModified <$> indexLastModified entry
     ]
 
+
+-- UTILS
+
+
+-- | An XML Namespace for the sitemaps.org @v0.9@ schema.
 sitemapNamespace :: Namespace
 sitemapNamespace = namespace "" "http://www.sitemaps.org/schemas/sitemap/0.9"
 
@@ -140,5 +178,6 @@ sitemapNamespace = namespace "" "http://www.sitemaps.org/schemas/sitemap/0.9"
 formatSitemapTime :: UTCTime -> T.Text
 formatSitemapTime = T.pack . formatTime defaultTimeLocale "%FT%T+00:00"
 
+-- | Render a 'UTCTime' in a @lastmod@ element.
 renderLastModified :: UTCTime -> Xml Elem
 renderLastModified = xelemWithText "lastmod" . formatSitemapTime
