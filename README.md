@@ -39,6 +39,15 @@ mySitemap =
 ```
 
 
+## Develop
+
+Build the package, documentation, & tests with `stack`:
+
+```sh
+stack build --pedantic --haddock --test --file-watch
+```
+
+
 ## License
 
 BSD-3, exceptions possible.
