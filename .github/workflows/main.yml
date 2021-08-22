@@ -36,14 +36,13 @@ jobs:
       - name: Cache Stack Artifacts
         uses: actions/cache@v2
         with:
-          key: stack-build-${{ matrix.resolver }}-${{ github.ref }}-${{ github.sha }}
+          key: stack-build-v2-${{ matrix.resolver }}-${{ github.ref }}-${{ github.sha }}
           path: |
             ~/.stack/
             .stack-work/
           restore-keys: |
-            stack-build-${{ matrix.resolver }}-${{ github.ref }}-
-            stack-build-${{ matrix.resolver }}-
-            stack-build-
+            stack-build-v2-${{ matrix.resolver }}-${{ github.ref }}-
+            stack-build-v2-${{ matrix.resolver }}-
       - uses: haskell/actions/setup@v1
         with:
           enable-stack: true
