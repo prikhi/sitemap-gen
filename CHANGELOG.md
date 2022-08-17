@@ -1,5 +1,9 @@
 # CHANGELOG
 
-# v0.1.0.0
+## master
+
+* Bump dependencies
+
+## v0.1.0.0
 
 * Initial Release
